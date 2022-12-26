@@ -1,90 +1,75 @@
 package br.com.apigetway.controller;
 
+import br.com.apigetway.converters.NumberConverter;
 import br.com.apigetway.exceptions.UnsupportedMathOperationException;
+import br.com.apigetway.math.SimpleMath;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class MathController {
 
-    @RequestMapping(value = "/calculator/{numberOne}+{numberTwo}", method = RequestMethod.GET) // Expecificando o tipo do parametro
+    private SimpleMath math = new SimpleMath();
+
+    @RequestMapping(value = "/sum/{numberOne}+{numberTwo}", method = RequestMethod.GET) // Expecificando o tipo do parametro
     public Double sum(@PathVariable(value = "numberOne") String numberOne,
                        @PathVariable(value = "numberTwo") String numberTwo) throws Exception {
 
-        if (!isNumeric(numberOne) || !isNumeric(numberTwo)){
+        if (!NumberConverter.isNumeric(numberOne) || !NumberConverter.isNumeric(numberTwo)){
             throw new UnsupportedMathOperationException("Please set a numeric value!");
         }
-        return convertToDouble(numberOne) + convertToDouble(numberTwo);
+        return math.sum(NumberConverter.convertToDouble(numberOne), NumberConverter.convertToDouble(numberTwo));
     }
 
-    @RequestMapping(value = "/calculator/{numberOne}-{numberTwo}", method = RequestMethod.GET)
+    @RequestMapping(value = "/sub/{numberOne}/{numberTwo}", method = RequestMethod.GET)
     public Double subtraction(@PathVariable(value = "numberOne") String numberOne,
                                @PathVariable(value = "numberTwo") String numberTwo) throws Exception {
 
-        if (!isNumeric(numberOne) || !isNumeric(numberTwo)){
+        if (!NumberConverter.isNumeric(numberOne) || !NumberConverter.isNumeric(numberTwo)){
             throw new UnsupportedMathOperationException("Please set a numeric value!");
         }
-        return convertToDouble(numberOne) - convertToDouble(numberTwo);
+        return math.subtraction(NumberConverter.convertToDouble(numberOne), NumberConverter.convertToDouble(numberTwo));
     }
 
-    @RequestMapping(value = "/calculator/{numberOne}/{numberTwo}", method = RequestMethod.GET)
+    @RequestMapping(value = "/mult/{numberOne}/{numberTwo}", method = RequestMethod.GET)
     public Double multiplication(@PathVariable(value = "numberOne") String numberOne,
                                   @PathVariable(value = "numberTwo") String numberTwo) throws Exception {
 
-        if (!isNumeric(numberOne) || !isNumeric(numberTwo)){
+        if (!NumberConverter.isNumeric(numberOne) || !NumberConverter.isNumeric(numberTwo)){
             throw new UnsupportedMathOperationException("Please set a numeric value!");
         }
-        return convertToDouble(numberOne) * convertToDouble(numberTwo);
+        return math.multiplication(NumberConverter.convertToDouble(numberOne), NumberConverter.convertToDouble(numberTwo));
     }
 
-    @RequestMapping(value = "/calculator/{numberOne}e{numberTwo}", method = RequestMethod.GET)
+    @RequestMapping(value = "/div/{numberOne}/{numberTwo}", method = RequestMethod.GET)
     public Double division(@PathVariable(value = "numberOne") String numberOne,
                             @PathVariable(value = "numberTwo") String numberTwo) throws Exception {
 
-        if (!isNumeric(numberOne) || !isNumeric(numberTwo)){
+        if (!NumberConverter.isNumeric(numberOne) || !NumberConverter.isNumeric(numberTwo)){
             throw new UnsupportedMathOperationException("Please set a numeric value!");
         }
-        return convertToDouble(numberOne) / convertToDouble(numberTwo);
+        return math.division(NumberConverter.convertToDouble(numberOne), NumberConverter.convertToDouble(numberTwo));
     }
 
-    @RequestMapping(value = "/calculator/{numberOne}/{numberTwo}/{numberThree}/{media}", method = RequestMethod.GET)
+    @RequestMapping(value = "/med/{numberOne}/{numberTwo}", method = RequestMethod.GET)
     public Double median(@PathVariable(value = "numberOne") String numberOne,
-                           @PathVariable(value = "numberTwo") String numberTwo,
-                             @PathVariable(value = "numberThree") String numberThree,
-                              @PathVariable(value = "media") String media) throws Exception {
+                           @PathVariable(value = "numberTwo") String numberTwo) throws Exception {
 
-        if (!isNumeric(numberOne) || !isNumeric(numberTwo) || !isNumeric(numberThree) || !isNumeric(media)){
+        if (!NumberConverter.isNumeric(numberOne) || !NumberConverter.isNumeric(numberTwo)){
             throw new UnsupportedMathOperationException("Please set a numeric value!");
         }
 
-        return (convertToDouble(numberOne) + convertToDouble(numberTwo) + convertToDouble(numberThree)) / convertToDouble(media);
+        return math.median(NumberConverter.convertToDouble(numberOne), NumberConverter.convertToDouble(numberTwo));
     }
 
-    @RequestMapping(value = "/calculator/{numberOne}", method = RequestMethod.GET)
+    @RequestMapping(value = "/root/{numberOne}", method = RequestMethod.GET)
     public Double root(@PathVariable(value = "numberOne") String numberOne) throws Exception {
 
-        if (!isNumeric(numberOne)){
+        if (!NumberConverter.isNumeric(numberOne)){
             throw new UnsupportedMathOperationException("Please set a numeric value!");
         }
 
-        return Math.sqrt(convertToDouble(numberOne));
+        return math.root(NumberConverter.convertToDouble(numberOne));
     }
 
-    private Double convertToDouble(String strNumber) {
-        if (strNumber == null) return 0D;
-
-        // verifica se o usuario enviar uma virgula seja trocado por um ponto
-        // BR 10,25 // US 10.25
-        String number = strNumber.replaceAll(",", ".");
-
-        if (isNumeric(number)) return Double.parseDouble(number);
-        return 0D;
-    }
-
-    private boolean isNumeric(String strNumber) {
-        if (strNumber == null) return false;
-        String number = strNumber.replaceAll(",", ".");
-
-        return number.matches("[-+]?[0-9]*\\.?[0-9]+");
-    }
 
 }
